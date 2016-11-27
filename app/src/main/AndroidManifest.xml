@@ -1,0 +1,28 @@
+
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.ayush.pe_project">
+    <uses-permission android:name = "android.permission.BLUETOOTH_ADMIN"/>
+    <uses-permission android:name = "android.permission.BLUETOOTH"/>
+
+    <application
+        android:allowBackup="true"
+        android:icon="@drawable/androidpic"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+        <activity
+            android:name=".BTDevicesList"
+            android:label="Devices List" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".MainActivity"
+            android:label="ARDUINO Control" >
+        </activity>
+
+    </application>
+
+</manifest>
