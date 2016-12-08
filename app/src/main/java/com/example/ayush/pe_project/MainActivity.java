@@ -82,7 +82,6 @@ public class MainActivity extends ActionBarActivity {
                         else
                                 sb.setEnabled(false);
                     }
-
                 });
             }
 
@@ -154,10 +153,6 @@ public class MainActivity extends ActionBarActivity {
             });
 
         }
-
-
-
-
 
     private void Disconnect()
     {
