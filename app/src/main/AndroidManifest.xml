@@ -22,6 +22,10 @@
             android:name=".MainActivity"
             android:label="Control Window" >
         </activity>
+        <activity
+            android:name=".Timer"
+            android:label="Timer" >
+        </activity>
 
     </application>
 

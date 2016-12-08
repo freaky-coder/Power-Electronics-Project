@@ -26,7 +26,7 @@ import java.util.UUID;
 
 public class MainActivity extends ActionBarActivity {
 
-    Button b1, btnDis;
+    Button b1, btnDis , tmr;
     SeekBar sb;
     TextView tv,info;
     String address = null;
@@ -49,12 +49,11 @@ public class MainActivity extends ActionBarActivity {
         setContentView(R.layout.main_layout);
         final View v = findViewById(R.id.layout_id).getRootView();
         // v.setBackgroundColor(getResources().getColor(android.R.color.holo_red_light));
-        //btn = (Button)findViewById(R.id.button3);
-        //btn2 = (Button)findViewById(R.id.button2);
-        System.out.print("********************Here*************************"+"\n");
+       
         sb = (SeekBar) findViewById(R.id.seekBar);
         tv = (TextView) findViewById(R.id.textView2);
         final ToggleButton tb = (ToggleButton) findViewById(R.id.toggleButton);
+        tmr=(Button )findViewById(R.id.timer);
         new ConnectBT().execute(); //Call the class to connect
         btnDis = (Button) findViewById(R.id.button3);
         tv.setText("Current Set Value: " + "0");
@@ -100,6 +99,14 @@ public class MainActivity extends ActionBarActivity {
                    b1.setText("More Info.");
                }
 
+            }
+        });
+        // Intent to the Timer Activity Page
+        tmr.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(MainActivity.this,Timer.class);
+                startActivity(i);
             }
         });
 
