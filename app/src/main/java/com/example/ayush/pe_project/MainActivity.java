@@ -33,107 +33,99 @@ public class MainActivity extends ActionBarActivity {
     BluetoothAdapter myBluetooth = null;
     BluetoothSocket btSocket = null;
     private boolean isBtConnected = false;
-     double firing_angle;
-     double voltage_out;
+    double firing_angle;
+    double voltage_out;
+    ToggleButton onoff;
 
     static  final UUID myUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
     @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         Intent newint = getIntent();
         address = newint.getStringExtra(BTDevicesList.EXTRA_ADDRESS);
         setContentView(R.layout.main_layout);
-        final View v=findViewById(R.id.layout_id).getRootView();
-       // v.setBackgroundColor(getResources().getColor(android.R.color.holo_red_light));
+        final View v = findViewById(R.id.layout_id).getRootView();
+        // v.setBackgroundColor(getResources().getColor(android.R.color.holo_red_light));
         //btn = (Button)findViewById(R.id.button3);
         //btn2 = (Button)findViewById(R.id.button2);
-        sb = (SeekBar)findViewById(R.id.seekBar);
-        tv=(TextView)findViewById(R.id.textView2);
-        final ToggleButton tb= (ToggleButton)findViewById(R.id.toggleButton);
+        sb = (SeekBar) findViewById(R.id.seekBar);
+        tv = (TextView) findViewById(R.id.textView2);
+        final ToggleButton tb = (ToggleButton) findViewById(R.id.toggleButton);
         new ConnectBT().execute(); //Call the class to connect
-        btnDis=(Button)findViewById(R.id.button3);
-        tv.setText("Current Set Value: "+ "0");
-        b1=(Button)findViewById(R.id.button1);
-        info=(TextView)findViewById(R.id.textView3);
+        btnDis = (Button) findViewById(R.id.button3);
+        tv.setText("Current Set Value: " + "0");
+        b1 = (Button) findViewById(R.id.button1);
+        info = (TextView) findViewById(R.id.textView3);
+        onoff = (ToggleButton) findViewById(R.id.toggleButton);
         // Onclick trigger
-
-
-
-
-
-        tb.setOnClickListener(new View.OnClickListener() {
+        onoff.setText("Off");
+        btnDis.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                if(tb.getText()=="on"||tb.getText()=="ON"||tb.getText()=="On")
-                {
-                    turnOn();
-                    v.setBackgroundColor(getResources().getColor(android.R.color.holo_green_light));
-                }
-                if(tb.getText()=="off"||tb.getText()=="OFF"||tb.getText()=="Off")
-                {
-                    turnOff();
-                    v.setBackgroundColor(getResources().getColor(android.R.color.holo_red_light));
-                    sb.setActivated(false);
-                }
-            }
-        });
-        //tb.setOnCheckedChangeListener(new View.OnClickListener());
-        btnDis.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
+            public void onClick(View v) {
                 Disconnect(); //close connection
             }
         });
+        if (onoff.getText() == "On") {
+            sb.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                @Override
+                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                    int send_value = 0;
 
-        sb.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                int send_value=0;
-                if (fromUser==true)
-                {
-                    firing_angle=(int) (progress*0.03125);
-                    send_value=(int) (progress*1.5625);
-                    voltage_out=(int)(230*(Math.sqrt( (Math.sin(2*firing_angle))-(2*firing_angle)+(2*3.14159))/(2*3.14159)));
-                    tv.setText("Current Set Value: "+send_value+"%");
-                    info.setText("Firing Angle: "+firing_angle+"\u03C0");
-                    info.append("\n");
-                    info.append("Output Voltage(Vo): "+voltage_out+ "V");
-                    System.out.println("****************"+send_value+"**************************");
-                    try
-                    {
-                        btSocket.getOutputStream().write(progress-1);
-                    }
-                    catch (IOException e)
-                    {
+                    if (fromUser == true) {
+                        firing_angle = (int) (progress * 5.625);
+                        send_value = (int) (progress * 1.5625);
+                        voltage_out = (int) (230 * (Math.sqrt((Math.sin(2 * (firing_angle * 0.0174))) - (2 * (firing_angle * 0.0174)) + (2 * 3.14159)) / (2 * 3.14159)));
+                        tv.setText("Set Value: " + send_value + "%");
 
+                        info.setText("Firing Angle: " + firing_angle + "\u00b0");
+                        info.append("\n");
+                        info.append("Output Voltage(Vo): " + voltage_out + "V");
+
+                        b1.setOnClickListener(new View.OnClickListener() {
+
+                            @Override
+                            public void onClick(View v) {
+                                int x = 0;
+                                if (x == 0) {
+                                    x = 0;
+                                    b1.setText("Less Info.");
+                                    info.setText(" ");
+                                } else {
+                                    x = 1;
+                                    b1.setText("More Info.");
+
+                                }
+                            }
+                        });
+                        System.out.println("****************" + send_value + "**************************");
+                        try {
+                            btSocket.getOutputStream().write(progress - 1);
+                        } catch (IOException e) {
+
+                        }
                     }
                 }
-            }
 
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
+                @Override
+                public void onStartTrackingTouch(SeekBar seekBar) {
 
-            }
+                }
 
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
+                @Override
+                public void onStopTrackingTouch(SeekBar seekBar) {
 
-            }
-        });
-        b1.setOnClickListener(new View.OnClickListener()
+                }
+            });
+
+        }
+        else
         {
-            @Override
-            public void onClick(View v)
-            {
-                if
-            }
-        });
+           sb.setEnabled(false);
+        }
     }
+
 
 
     private void Disconnect()
