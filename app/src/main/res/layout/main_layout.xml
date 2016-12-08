@@ -14,7 +14,7 @@
             android:layout_height="wrap_content"
             android:id="@+id/seekBar"
             android:indeterminate="false"
-            android:max="64"
+            android:max="63"
             android:layout_alignParentTop="true"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
@@ -74,8 +74,7 @@
             android:text="Medium Text"
             android:id="@+id/textView3"
             android:layout_centerVertical="true"
-            android:layout_alignLeft="@+id/textView2"
-            android:layout_alignStart="@+id/textView2" />
+            android:layout_centerHorizontal="true" />
 
 
     </RelativeLayout>

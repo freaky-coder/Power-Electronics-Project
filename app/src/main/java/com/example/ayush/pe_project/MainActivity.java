@@ -1,5 +1,6 @@
 package com.example.ayush.pe_project;
 
+import android.os.Handler;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -36,7 +37,7 @@ public class MainActivity extends ActionBarActivity {
     double firing_angle;
     double voltage_out;
     ToggleButton onoff;
-
+    Handler handler;
     static  final UUID myUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
     @Override
@@ -50,6 +51,7 @@ public class MainActivity extends ActionBarActivity {
         // v.setBackgroundColor(getResources().getColor(android.R.color.holo_red_light));
         //btn = (Button)findViewById(R.id.button3);
         //btn2 = (Button)findViewById(R.id.button2);
+        System.out.print("********************Here*************************"+"\n");
         sb = (SeekBar) findViewById(R.id.seekBar);
         tv = (TextView) findViewById(R.id.textView2);
         final ToggleButton tb = (ToggleButton) findViewById(R.id.toggleButton);
@@ -59,15 +61,58 @@ public class MainActivity extends ActionBarActivity {
         b1 = (Button) findViewById(R.id.button1);
         info = (TextView) findViewById(R.id.textView3);
         onoff = (ToggleButton) findViewById(R.id.toggleButton);
-        // Onclick trigger
-        onoff.setText("Off");
+        b1.setText("More Info.");
+        info.setText("  ");
+        onoff.setClickable(true);
+        onoff.setChecked(false);
+        sb.setEnabled(false);
+
+
+       handler = new Handler();
+
+        final Runnable r = new Runnable() {
+            public void run()
+            {
+
+                onoff.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                            if(onoff.isChecked()==false)
+                            sb.setEnabled(true);
+                        else
+                                sb.setEnabled(false);
+                    }
+
+                });
+            }
+
+        };
+        handler.postDelayed(r, 1000);
+
+        b1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+               if(b1.getText()=="More Info.")
+               {
+                   b1.setText("Less Info.");
+                               }
+               else
+               {
+                   b1.setText("More Info.");
+               }
+
+            }
+        });
+
         btnDis.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Disconnect(); //close connection
             }
         });
-        if (onoff.getText() == "On") {
+
+
+
             sb.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
                 @Override
                 public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -75,33 +120,22 @@ public class MainActivity extends ActionBarActivity {
 
                     if (fromUser == true) {
                         firing_angle = (int) (progress * 5.625);
-                        send_value = (int) (progress * 1.5625);
+                        send_value = (int) (progress * 1.58730);
                         voltage_out = (int) (230 * (Math.sqrt((Math.sin(2 * (firing_angle * 0.0174))) - (2 * (firing_angle * 0.0174)) + (2 * 3.14159)) / (2 * 3.14159)));
                         tv.setText("Set Value: " + send_value + "%");
+                        if(b1.getText()=="Less Info.") {
+                            info.setText("Firing Angle: " + firing_angle + "\u00b0");
+                            info.append("\n");
+                            info.append("Output Voltage(Vo): " + voltage_out + "V");
+                        }
+                        else if (b1.getText()=="More Info.")
+                        {
+                            info.setText(" ");
+                        }
 
-                        info.setText("Firing Angle: " + firing_angle + "\u00b0");
-                        info.append("\n");
-                        info.append("Output Voltage(Vo): " + voltage_out + "V");
-
-                        b1.setOnClickListener(new View.OnClickListener() {
-
-                            @Override
-                            public void onClick(View v) {
-                                int x = 0;
-                                if (x == 0) {
-                                    x = 0;
-                                    b1.setText("Less Info.");
-                                    info.setText(" ");
-                                } else {
-                                    x = 1;
-                                    b1.setText("More Info.");
-
-                                }
-                            }
-                        });
                         System.out.println("****************" + send_value + "**************************");
                         try {
-                            btSocket.getOutputStream().write(progress - 1);
+                            btSocket.getOutputStream().write(progress );
                         } catch (IOException e) {
 
                         }
@@ -120,11 +154,8 @@ public class MainActivity extends ActionBarActivity {
             });
 
         }
-        else
-        {
-           sb.setEnabled(false);
-        }
-    }
+
+
 
 
 
@@ -241,4 +272,5 @@ public class MainActivity extends ActionBarActivity {
             progress.dismiss();
         }
     }
+
 }
