@@ -5,7 +5,6 @@ import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-
 import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
 import android.view.View;
@@ -19,7 +18,6 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.os.AsyncTask;
 import android.widget.ToggleButton;
-
 import java.io.IOException;
 import java.util.UUID;
 
@@ -49,7 +47,7 @@ public class MainActivity extends ActionBarActivity {
         setContentView(R.layout.main_layout);
         final View v = findViewById(R.id.layout_id).getRootView();
         // v.setBackgroundColor(getResources().getColor(android.R.color.holo_red_light));
-       
+
         sb = (SeekBar) findViewById(R.id.seekBar);
         tv = (TextView) findViewById(R.id.textView2);
         final ToggleButton tb = (ToggleButton) findViewById(R.id.toggleButton);
