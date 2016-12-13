@@ -1,5 +1,9 @@
 package com.example.ayush.pe_project;
 
+import android.app.Activity;
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.os.CountDownTimer;
 import android.os.Handler;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -22,11 +26,12 @@ import java.io.IOException;
 import java.util.UUID;
 
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends Activity {
 
     Button b1, btnDis , tmr;
     SeekBar sb;
     TextView tv,info;
+    int ttt=0;
     String address = null;
     private ProgressDialog progress;
     BluetoothAdapter myBluetooth = null;
@@ -36,12 +41,16 @@ public class MainActivity extends ActionBarActivity {
     double voltage_out;
     ToggleButton onoff;
     Handler handler;
+//    SharedPreferences sharedPref=this.getSharedPreferences("LOL",MODE_PRIVATE);
+    int prev_sb_value=0;
+    int value=0;
+    int i,x;
     static  final UUID myUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        System.out.println("************LOL**********"+value+"\n");
         Intent newint = getIntent();
         address = newint.getStringExtra(BTDevicesList.EXTRA_ADDRESS);
         setContentView(R.layout.main_layout);
@@ -52,7 +61,9 @@ public class MainActivity extends ActionBarActivity {
         tv = (TextView) findViewById(R.id.textView2);
         final ToggleButton tb = (ToggleButton) findViewById(R.id.toggleButton);
         tmr=(Button )findViewById(R.id.timer);
-        new ConnectBT().execute(); //Call the class to connect
+
+            new ConnectBT().execute(); //Call the class to connect
+
         btnDis = (Button) findViewById(R.id.button3);
         tv.setText("Current Set Value: " + "0");
         b1 = (Button) findViewById(R.id.button1);
@@ -70,14 +81,24 @@ public class MainActivity extends ActionBarActivity {
         final Runnable r = new Runnable() {
             public void run()
             {
-
+                //ttt=sharedPref.getInt("lola",0);
+                System.out.println("%%%%%%%%%%%%%%%%%%"+ttt+"%%%%%%%%%%%%%%%%%%%%%5");
                 onoff.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                            if(onoff.isChecked()==false)
+                        if (onoff.isChecked() == false)
                             sb.setEnabled(true);
-                        else
-                                sb.setEnabled(false);
+                        else {
+                            try {
+                                btSocket.getOutputStream().write(0);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+
+                            sb.setEnabled(false);
+
+
+                        }
                     }
                 });
             }
@@ -114,19 +135,17 @@ public class MainActivity extends ActionBarActivity {
                 Disconnect(); //close connection
             }
         });
-
-
-
             sb.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
                 @Override
                 public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                     int send_value = 0;
 
                     if (fromUser == true) {
-                        firing_angle = (int) (progress * 5.625);
+                        firing_angle = (int)(180- (progress * 2.8125));
                         send_value = (int) (progress * 1.58730);
-                        voltage_out = (int) (230 * (Math.sqrt((Math.sin(2 * (firing_angle * 0.0174))) - (2 * (firing_angle * 0.0174)) + (2 * 3.14159)) / (2 * 3.14159)));
-                        tv.setText("Set Value: " + send_value + "%");
+                       // voltage_out = (int) (230 * (Math.sqrt((Math.sin(2 * (firing_angle * 0.0174))) - (2 * (firing_angle * 0.0174)) + (2 * 3.14159)) / (2 * 3.14159)));
+                        voltage_out=(int)(129.94*Math.sqrt((3.14-firing_angle)+(Math.sin(2*firing_angle))/2));
+                        tv.setText("Intensity: " + send_value + "%");
                         if(b1.getText()=="Less Info.") {
                             info.setText("Firing Angle: " + firing_angle + "\u00b0");
                             info.append("\n");
@@ -137,24 +156,31 @@ public class MainActivity extends ActionBarActivity {
                             info.setText(" ");
                         }
 
-                        System.out.println("****************" + send_value + "**************************");
-                        try {
+
+                       /* try {
                             btSocket.getOutputStream().write(progress );
                         } catch (IOException e) {
 
-                        }
+                        }*/
                     }
                 }
 
                 @Override
                 public void onStartTrackingTouch(SeekBar seekBar) {
-
+                    prev_sb_value=sb.getProgress();
                 }
 
                 @Override
                 public void onStopTrackingTouch(SeekBar seekBar) {
 
+                    try {
+                        btSocket.getOutputStream().write(sb.getProgress());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
+
+
             });
 
         }
@@ -178,14 +204,14 @@ public class MainActivity extends ActionBarActivity {
     {
         if (btSocket!=null)
         {
-            try
+           /* try
             {
-                btSocket.getOutputStream().write(String.valueOf(progress).getBytes());
+                //btSocket.getOutputStream().write(String.valueOf(progress).getBytes());
             }
             catch (IOException e)
             {
                 msg("Error");
-            }
+            }*/
         }
     }
 
@@ -193,14 +219,14 @@ public class MainActivity extends ActionBarActivity {
     {
         if (btSocket!=null)
         {
-            try
+           /* try
             {
-                btSocket.getOutputStream().write("TO".toString().getBytes());
+                //btSocket.getOutputStream().write("TO".toString().getBytes());
             }
             catch (IOException e)
             {
                 msg("Error");
-            }
+            }*/
         }
     }
 
@@ -243,7 +269,7 @@ public class MainActivity extends ActionBarActivity {
                 {
                     myBluetooth = BluetoothAdapter.getDefaultAdapter();//get the mobile bluetooth device
                     BluetoothDevice dispositivo = myBluetooth.getRemoteDevice(address);//connects to the device's address and checks if it's available
-                    btSocket = dispositivo.createInsecureRfcommSocketToServiceRecord(myUUID);//create a RFCOMM (SPP) connection
+                    btSocket = dispositivo.createInsecureRfcommSocketToServiceRecord(myUUID);//create a RFCOMM connection
                     BluetoothAdapter.getDefaultAdapter().cancelDiscovery();
                     btSocket.connect();//start connection
                 }
